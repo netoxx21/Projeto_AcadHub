@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" sizes="512x512" href="/Projeto-AcadHub/Frontend/js/img/logo.png?v=6">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <link href="frontend/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="frontend/assets/logo.png" alt="AcadHub Logo" class="logo">
+            </a>
+
+            <div class="navbar-collapse" id="acadhubNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="upload.html">Upload de resumos</a>
+                    </li>
+                </ul>
+                <form class="d-flex me-3" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" style="width: 150px;"/>
+                    <button class="btn-outline-success" type="submit">Buscar</button>
+                </form>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="login.html">sair</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="container mt-5">
+        <div class="row justify-content-center">
+            <!-- As colunas controlam a largura do formulário -->
+            <div class="col-md-8 col-lg-6">
+                <h2 class="mb-4 text-center">Enviar novo resumo</h2>
+                <form id="form-upload" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título do resumo:</label>
+                        <input type="text" id="titulo" name="titulo" class="form-control" required placeholder="Título">
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição breve:</label>
+                        <textarea name="descricao" id="descricao" rows="4" class="form-control" required placeholder="Descreva o conteudo"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="curso" class="form-label">Curso/Área de conhecimento</label>
+                        <input type="text" id="curso" name="curso" class="form-control" required placeholder="Indique o curso">
+                    </div>
+                    <div class="mb-3">
+                        <label for="arquivo" class="form-label">Selecione o arquivo</label>
+                        <input type="file" id="arquivo" name="arquivo" class="form-control" accept=".pdf,.doc,.docx" required >
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn-secundary">Enviar Resumo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

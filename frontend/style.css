@@ -3,7 +3,7 @@
 body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     margin: 0;
-    background-color:  #C7D2E5; 
+    background-color:  hsl(0, 0%, 99%); 
     color: #212529;
 }
 
@@ -14,7 +14,7 @@ body {
     justify-content: space-between;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-    background-color: #C7D2E5; 
+    background-color:hsl(239, 100%, 59%);  
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
