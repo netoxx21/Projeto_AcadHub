@@ -6,9 +6,8 @@
     <title>Login</title>
     <link rel="stylesheet" href="frontend/style.css">
 </head>
-<body>
-    <body class="login-page">
-    
+<body class="login-page">
+
     <main class="container">
         
         <div class="lado-azul">
@@ -33,11 +32,46 @@
                 </div>
                 <button type="submit" class="btn-primary">Entrar</button>
             </form>
-
-            
-            
         </div>
         
     </main>
-</body>
+<script>
+    // Adiciona um ouvinte de evento para o envio do formulário
+    document.getElementById('form-login').addEventListener('submit', async (e) => 
+    {e.preventDefault();// Impede que a página recarregue
+
+        // Captura os valores digitados
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+            try {
+                // Faz uma requisição POST para o backend
+                const res = await fetch('http://localhost:4000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }, // Envia em formato JSON
+                body: JSON.stringify({ email, senha })// Corpo da requisição
+                });
+
+                 // Lê o retorno da API como JSON
+                const data = await res.json();
+
+                    // Se o login for bem-sucedido e o backend retornar um token:
+                    if (res.ok && data.token) {
+                        // Salva o token no localStorage (mantém o usuário logado)
+                        localStorage.setItem('token', data.token);
+                        console.log('token salvo:', data.token);
+                        // redireciona para a página de upload (caminho relativo)
+                        window.location.href = 'upload.html';
+                    return;
+                }
+                // Caso o login falhe
+                alert(data.message || data.error || 'Erro no login');
+                    } catch (err) {
+                        // Caso o backend não esteja acessível
+                        console.error('Erro no fetch /api/login:', err);
+                        alert('Falha ao conectar com o servidor.');
+                    }
+            });
+        </script>
+    </body>
 </html>

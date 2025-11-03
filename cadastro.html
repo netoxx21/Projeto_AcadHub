@@ -53,5 +53,38 @@
 
         </div>
     </main>
+<script>
+
+     // Quando o formulário for enviado:
+        document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impede que a página recarregue
+
+        // Pega os valores dos campos
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        // Faz uma requisição POST para a API de cadastro
+        const res = await fetch('http://localhost:4000/api/cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },// Corpo em formato JSON
+            body: JSON.stringify({ nome, email, senha })
+    });
+
+        // Interpreta a resposta como JSON
+        const data = await res.json();
+
+            // Se o cadastro foi bem-sucedido
+            if (res.ok) {
+                alert('Cadastro realizado com sucesso! Faça login.');
+                // Redireciona para a página de login
+                    window.location = '/login.html';
+                } else {
+                    // Exibe mensagem de erro retornada pelo servidor
+                    alert(data.error || data.message || 'Erro no cadastro');
+            }
+        });
+</script>
+
 </body>
 </html>
