@@ -142,6 +142,35 @@ app.post('/api/upload', upload.single('arquivo'), async (req, res) => {
   }
 });
 
+// GET /api/resumos -> retorna resumos com URL do arquivo
+app.get('/api/resumos', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT r.id, r.titulo, r.descricao, r.curso, r.arquivo, r.created_at, u.id AS user_id, u.nome AS uploader
+       FROM resumos r
+       LEFT JOIN users u ON u.id = r.user_id
+       ORDER BY r.created_at DESC`
+    );
+
+    const rows = result.rows.map(r => ({
+      id: r.id,
+      titulo: r.titulo,
+      descricao: r.descricao,
+      curso: r.curso,
+      arquivo: r.arquivo,
+      url: r.arquivo ? `${req.protocol}://${req.get('host')}/uploads/${r.arquivo}` : null,
+      created_at: r.created_at,
+      uploader: r.uploader,
+      user_id: r.user_id
+    }));
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Erro /api/resumos:', err);
+    res.status(500).json({ message: 'Erro ao buscar resumos.' });
+  }
+});
+
 //Rota de teste (opcional)
 app.get('/', (req, res) => {
   res.send('Servidor rodando corretamente 🚀');
