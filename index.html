@@ -31,14 +31,6 @@
 
       </ul>
 
-      <form class="d-flex me-3" role="search">
-
-        <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search"/>
-
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
-
-      </form>
-
      <ul class="navbar-nav">
         <li class="nav-item">
             <!-- adicionei id para interceptar o clique e pedir confirmação -->
@@ -53,9 +45,11 @@
   <main class="container py-4">
     <h1 class="mb-3">Biblioteca de Resumos</h1>
 
-    <div class="mb-3">
-      <input id="search" class="form-control" placeholder="Pesquisar título, descrição ou curso..." />
+    <div class="mb-3 d-flex" style="max-width: 600px;">
+      <input id="search" class="form-control me-2" placeholder="Pesquisar título, descrição ou curso..." />
+      <button title="Enviar novo resumo" id="btn-upload" class="btn fw-bold" style="background-color: #2a79ef; border-color: #0d6efd;">+</button>
     </div>
+
 
     <div id="lista-resumos" class="list-group">
       <!-- resumos serão inseridos aqui -->
@@ -129,6 +123,13 @@
 
   // inicializa
   fetchResumos();
+
+  const btnUpload = document.getElementById('btn-upload');
+    if (btnUpload) {
+      btnUpload.addEventListener('click', function() {
+       window.location.href = 'upload.html';
+      });
+}
 </script>
 </body>
 </html>
