@@ -142,6 +142,7 @@ app.post('/api/upload', upload.single('arquivo'), async (req, res) => {
   }
 });
 
+
 // GET /api/resumos -> retorna resumos com URL do arquivo
 app.get('/api/resumos', async (req, res) => {
   try {
@@ -173,7 +174,7 @@ app.get('/api/resumos', async (req, res) => {
 
 //Rota de teste (opcional)
 app.get('/', (req, res) => {
-  res.send('Servidor rodando corretamente 🚀');
+  res.send('Servidor rodando corretamente');
 });
 
 // Inicialização do servidor

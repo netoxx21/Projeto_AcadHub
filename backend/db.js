@@ -1,32 +1,42 @@
-const dotenv = require('dotenv');//Importa o pacote dotenv para carregar variáveis de ambiente do arquivo .env
-const path = require('path');//Importa o módulo path do Node para lidar com caminhos de arquivos
-const { Pool } = require('pg');//Importa o Pool do pacote pg para conectar ao PostgreSQL
+const dotenv = require('dotenv');
+const path = require('path');
+const { Pool } = require('pg');
 
-// Carrega as variáveis de ambiente do arquivo .env que está na raiz do projeto
-// path.resolve garante que o caminho seja absoluto e correto independente do SO
-dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+// Carrega o arquivo .env na raiz do projeto
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+}
 
-// Configurações de conexão usando as variáveis do .env
-const pool = new Pool({
-  user: process.env.PGUSER,// usuário do PostgreSQL
-  host: process.env.PGHOST,// host do banco (ex: localhost)
-  database: process.env.PGDATABASE,// nome do banco de dados
-  password: process.env.PGPASSWORD,// senha do banco
-  port: process.env.PGPORT,// porta do banco (geralmente 5432)
-});
 
-// Teste de Conexão do servidor com o PostgreSQL
+// Se houver DATABASE_URL (ambiente de produção), usa ela
+// Senão, usa as variáveis locais (ambiente de desenvolvimento)
+const isProduction = process.env.DATABASE_URL ? true : false;
+
+const pool = new Pool(
+  isProduction
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false } // obrigatório no Supabase/Render
+      }
+    : {
+        user: process.env.PGUSER,
+        host: process.env.PGHOST,
+        database: process.env.PGDATABASE,
+        password: process.env.PGPASSWORD,
+        port: process.env.PGPORT
+      }
+);
+
+// Teste de Conexão
 pool.connect()
   .then(client => {
-    console.log('Conexão com o PostgreSQL estabelecida com sucesso!');
-    client.release(); // Libera o cliente de volta para o pool
+    console.log('Conexão estabelecida com sucesso!');
+    client.release();
   })
   .catch(err => {
-    console.error('ERRO FATAL: Falha de Conexão com o PostgreSQL.');
-    console.error('Detalhe do Erro:', err.message);
-    console.error('Verifique: 1) Se o serviço PostgreSQL está rodando. 2) As credenciais no seu arquivo .env.');
-    process.exit(1);// Encerra o processo do Node caso a conexão não seja possível
+    console.error('ERRO FATAL: Falha de Conexão.');
+    console.error('Detalhe:', err.message);
+    process.exit(1);
   });
 
-//Exporta apenas o pool, não um objeto com pool dentro
 module.exports = pool;
