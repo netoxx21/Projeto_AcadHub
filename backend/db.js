@@ -2,21 +2,20 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { Pool } = require('pg');
 
-// Carrega o arquivo .env na raiz do projeto
-if (process.env.NODE_ENV !== "production") {
+// Só carrega o arquivo .env local **quando necessário**
+// Nunca força caminho no Render
+if (!process.env.DATABASE_URL) {
   dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 }
 
-
-// Se houver DATABASE_URL (ambiente de produção), usa ela
-// Senão, usa as variáveis locais (ambiente de desenvolvimento)
-const isProduction = process.env.DATABASE_URL ? true : false;
+// Verifica se está em produção (Render)
+const isProduction = Boolean(process.env.DATABASE_URL);
 
 const pool = new Pool(
   isProduction
     ? {
         connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false } // obrigatório no Supabase/Render
+        ssl: { rejectUnauthorized: false }
       }
     : {
         user: process.env.PGUSER,
