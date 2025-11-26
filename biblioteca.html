@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Biblioteca - AcadHub</title>
+  <link rel="icon" href="frontend/assets/logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="frontend/style.css">
+</head>
+
+<body>
+
+<!-- Navbar global -->
+<div id="navbar"></div>
+<script>
+  fetch("frontend/components/navbar.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("navbar").innerHTML = html);
+</script>
+
+
+<main class="container py-4">
+
+  <h1 class="mb-3">Biblioteca de Resumos</h1>
+
+  <!-- Barra de pesquisa -->
+  <div class="mb-3 d-flex" style="max-width: 600px;">
+    <input id="search" class="form-control me-2" placeholder="Pesquisar título, descrição ou curso...">
+    <button id="btn-upload" class="btn fw-bold" style="background-color:#2a79ef; border-color:#0d6efd;"> + </button>
+  </div>
+
+  <div id="lista-resumos" class="list-group"></div>
+
+</main>
+
+
+<script>
+// Base da API
+const BASE_URL = window.BASE_URL || "http://localhost:4000";
+
+// Garante que o usuário está logado
+(function checkAuth() {
+  const token = localStorage.getItem("token");
+  if (!token) return window.location.href = "login.html";
+})();
+
+// Busca lista de resumos
+async function fetchResumos() {
+  const container = document.getElementById("lista-resumos");
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/resumos`, {
+      headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+    });
+
+    if (!res.ok) throw new Error("Erro ao buscar resumos");
+
+    const data = await res.json();
+    renderResumos(data);
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `<div class="text-danger">Não foi possível carregar os resumos.</div>`;
+  }
+}
+
+// Renderizar lista
+function renderResumos(lista) {
+  const container = document.getElementById("lista-resumos");
+
+  if (!lista.length) {
+    container.innerHTML = `<div class="text-muted">Nenhum resumo disponível.</div>`;
+    return;
+  }
+
+  container.innerHTML = lista.map(r => `
+    <div class="list-group-item">
+
+      <div class="d-flex w-100 justify-content-between">
+        <h5>${escapeHtml(r.titulo)}</h5>
+        <small class="text-muted">${new Date(r.created_at).toLocaleString()}</small>
+      </div>
+
+      <p>${escapeHtml(r.descricao || "")}</p>
+
+      <small class="text-muted">
+        Curso: ${escapeHtml(r.curso || "-")}
+        ${r.uploader ? " • Enviado por: " + escapeHtml(r.uploader) : ""}
+      </small>
+
+      <div class="mt-2">
+        ${r.url ? `<a class="btn btn-sm btn-outline-primary" href="${r.url}" target="_blank">Baixar / Ver</a>` : ""}
+      </div>
+
+    </div>
+  `).join("");
+}
+
+// Evita injeção HTML
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, s => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  }[s]));
+}
+
+// Pesquisa local
+document.getElementById("search").addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll("#lista-resumos .list-group-item").forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(q) ? "" : "none";
+  });
+});
+
+// Botão para nova publicação
+document.getElementById("btn-upload").addEventListener("click", () => {
+  window.location.href = "upload.html";
+});
+
+// Inicializa
+fetchResumos();
+</script>
+
+</body>
+</html>

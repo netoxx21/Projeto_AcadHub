@@ -173,11 +173,11 @@ app.get('/api/resumos', async (req, res) => {
 });
 
 //Rota de teste (opcional)
-app.get('/', (req, res) => {
+  app.get('/', (req, res) => {
   res.send('Servidor rodando corretamente');
 });
 
 // Inicialização do servidor
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+  app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

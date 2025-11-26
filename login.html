@@ -1,77 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="frontend/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - AcadHub</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="frontend/assets/logo.png">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="frontend/style.css">
 </head>
+
 <body class="login-page">
 
-    <main class="container">
-        
-        <div class="lado-azul">
-        <div class="conteudo-lado-azul">
-            <img src="frontend/assets/logo.png" alt="Logo" class="imagem-centralizada">
-            <div class="link-cadastro">
-                Ainda não tem uma conta? <a href="cadastro.html" class="btn-secondary">Cadastrar</a>
-            </div>    
-        
-        </div>
-        
-        <div class="lado-branco">
-            
-            <h1>Login</h1> <form id="form-login">
-                <div class="input-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" required placeholder="exemplo@acadhub.com">
-                </div>
-                <div class="input-group">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="senha" required placeholder="Sua senha">
-                </div>
-                <button type="submit" class="btn-primary">Entrar</button>
-            </form>
-        </div>
-        
-    </main>
+<main class="container">
+
+  <!-- Lado Azul (logo + link) -->
+  <div class="lado-azul">
+    <div class="conteudo-lado-azul">
+      <img src="frontend/assets/logo.png" alt="Logo" class="imagem-centralizada">
+
+      <div class="link-cadastro">
+        Ainda não tem uma conta?  
+        <a href="cadastro.html" class="btn-secondary">Cadastrar</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lado Branco (formulário) -->
+  <div class="lado-branco">
+
+    <h1>Login</h1>
+
+    <form id="form-login">
+
+      <div class="input-group">
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" required placeholder="exemplo@acadhub.com">
+      </div>
+
+      <div class="input-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required placeholder="Sua senha">
+      </div>
+
+      <button type="submit" class="btn-primary">Entrar</button>
+    </form>
+  </div>
+
+</main>
+
+
 <script>
-    // Adiciona um ouvinte de evento para o envio do formulário
-    document.getElementById('form-login').addEventListener('submit', async (e) => 
-    {e.preventDefault();// Impede que a página recarregue
+// Base do backend (local 4000 ou nuvem)
+const BASE_URL = window.BASE_URL || "http://localhost:4000";
 
-        // Captura os valores digitados
-        const email = document.getElementById('email').value;
-        const senha = document.getElementById('senha').value;
+// Login do usuário
+document.getElementById("form-login").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-            try {
-                // Faz uma requisição POST para o backend
-                const res = await fetch('http://localhost:4000/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, // Envia em formato JSON
-                body: JSON.stringify({ email, senha })// Corpo da requisição
-                });
+  const email = email.value.trim();
+  const senha = senha.value.trim();
 
-                 // Lê o retorno da API como JSON
-                const data = await res.json();
+  if (!email || !senha)
+    return alert("Preencha todos os campos.");
 
-                    // Se o login for bem-sucedido e o backend retornar um token:
-                    if (res.ok && data.token) {
-                        // Salva o token no localStorage (mantém o usuário logado)
-                        localStorage.setItem('token', data.token);
-                        console.log('token salvo:', data.token);
-                        // redireciona para a página de upload (caminho relativo)
-                        window.location.href = 'upload.html';
-                    return;
-                }
-                // Caso o login falhe
-                alert(data.message || data.error || 'Erro no login');
-                    } catch (err) {
-                        // Caso o backend não esteja acessível
-                        console.error('Erro no fetch /api/login:', err);
-                        alert('Falha ao conectar com o servidor.');
-                    }
-            });
-        </script>
-    </body>
+  if (!/.+@.+\..+/.test(email))
+    return alert("Digite um e-mail válido.");
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, senha })
+    });
+
+    let data;
+    try { data = await res.json(); }
+    catch { data = { message: "Erro inesperado do servidor." }; }
+
+    if (res.ok && data.token) {
+      localStorage.setItem("token", data.token);
+      window.location.href = "upload.html";
+      return;
+    }
+
+    alert(data.error || data.message || "Erro ao efetuar login.");
+
+  } catch (err) {
+    console.error("Erro:", err);
+    alert("Servidor indisponível. Verifique se está rodando localmente (porta 4000).");
+  }
+});
+</script>
+
+</body>
 </html>

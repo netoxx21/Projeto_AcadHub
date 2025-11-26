@@ -1,135 +1,118 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Biblioteca - AcadHub</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="frontend/style.css" rel="stylesheet">
+    <link rel="icon" href="frontend/assets/logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro-AcadHub</title>
+    <link rel="stylesheet" href="frontend/style.css">
 </head>
-<body>
+<body class="login-page">
     
- <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-  <div class="container-fluid">
+    <main class="container">
+        
+        <div class="lado-azul">
+            <div class="conteudo-lado-azul">
+                <img src="frontend/assets/logo.png" alt="Ícone AcadHub" class="imagem-centralizada">
+                
+                <div class="link-cadastro">
+                    Já tem uma conta? <a href="login.html">Fazer Login</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="lado-branco">
+            
+            <h1>Cadastro</h1>
+            
+            <form id="form-cadastro">
+                
+                <div class="input-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Seu nome completo">
+                </div>
 
-    <a class="navbar-brand" href="#">AcadHub</a>
+                <div class="input-group">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" required placeholder="exemplo@acadhub.com">
+                </div>
 
+                <div class="input-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" name="senha" required placeholder="Mínimo 8 caracteres">
+                </div>
 
-    <div class="collapse navbar-collapse" id="acadhubNavbar">
+                <div class="input-group">
+                    <label for="confirmar-senha">Confirme a Senha:</label>
+                    <input type="password" id="confirmar-senha" name="confirmar-senha" required placeholder="Confirme sua senha">
+                </div>
 
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <button type="submit" class="btn-primary">Cadastrar</button>
+            </form>
 
-        <li class="nav-item">
-          <a class="nav-link" href="index.html">Inicio</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="upload.html">Upload de resumos</a>
-        </li>
-
-        </li>
-
-      </ul>
-
-     <ul class="navbar-nav">
-        <li class="nav-item">
-            <!-- adicionei id para interceptar o clique e pedir confirmação -->
-            <a id="logout-link" class="nav-link text-danger" href="login.html">sair</a>
-        </li>
-      </ul>
-
-    </div>
-  </div>
-</nav>
-
-  <main class="container py-4">
-    <h1 class="mb-3">Biblioteca de Resumos</h1>
-
-    <div class="mb-3 d-flex" style="max-width: 600px;">
-      <input id="search" class="form-control me-2" placeholder="Pesquisar título, descrição ou curso..." />
-      <button title="Enviar novo resumo" id="btn-upload" class="btn fw-bold" style="background-color: #2a79ef; border-color: #0d6efd;">+</button>
-    </div>
-
-
-    <div id="lista-resumos" class="list-group">
-      <!-- resumos serão inseridos aqui -->
-    </div>
-  </main>
-
+        </div>
+    </main>
 <script>
-  // busca resumos do backend e renderiza na página
-  async function fetchResumos() {
+
+// CONFIGURAÇÃO DE AMBIENTE
+const BASE_URL = window.BASE_URL || "http://localhost:4000";
+
+// EVENTO DE ENVIO DO FORMULÁRIO DE CADASTRO
+document.getElementById("form-cadastro").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  // Captura dos campos
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+  const confirmarSenha = document.getElementById("confirmar-senha").value.trim();
+
+  // VALIDAÇÕES BÁSICAS
+  if (!nome || !email || !senha || !confirmarSenha) {
+    return alert("Preencha todos os campos.");
+  }
+
+  if (senha.length < 8) {
+    return alert("A senha deve conter no mínimo 8 caracteres.");
+  }
+
+  if (senha !== confirmarSenha) {
+    return alert("As senhas não coincidem.");
+  }
+
+  // REQUISIÇÃO AO BACKEND
+  try {
+    const res = await fetch(`${BASE_URL}/api/cadastro`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, email, senha }),
+    });
+
+    let data;
     try {
-      const res = await fetch('http://localhost:4000/api/resumos');
-      if (!res.ok) throw new Error('Falha ao carregar resumos: ' + res.status);
-      const data = await res.json();
-      renderResumos(data);
-    } catch (err) {
-      console.error(err);
-      document.getElementById('lista-resumos').innerHTML = '<div class="text-danger">Não foi possível carregar os resumos.</div>';
+      data = await res.json();
+    } catch {
+      data = { message: "Erro inesperado. Tente novamente." };
     }
-  }
 
-  // cria itens na lista
-  function renderResumos(items) {
-    const container = document.getElementById('lista-resumos');
-    if (!items || items.length === 0) {
-      container.innerHTML = '<div class="text-muted">Nenhum resumo disponível.</div>';
-      return;
+    // CADASTRO REALIZADO COM SUCESSO
+    if (res.ok) {
+      alert("Cadastro realizado com sucesso! Faça login.");
+      return window.location.href = "login.html";
     }
-    container.innerHTML = items.map(i => `
-      <div class="list-group-item">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">${escapeHtml(i.titulo)}</h5>
-          <small class="text-muted">${new Date(i.created_at).toLocaleString()}</small>
-        </div>
-        <p class="mb-1">${escapeHtml(i.descricao || '')}</p>
-        <small class="text-muted">Curso: ${escapeHtml(i.curso || '-')}${i.uploader ? ' • Enviado por: ' + escapeHtml(i.uploader) : ''}</small>
-        <div class="mt-2">
-          ${i.url ? `<a class="btn btn-sm btn-outline-primary" href="${i.url}" target="_blank" rel="noopener">Baixar / Ver</a>` : ''}
-        </div>
-      </div>
-    `).join('');
+
+    // ERRO RETORNADO PELO BACKEND
+    alert(data.error || data.message || "Erro ao realizar cadastro.");
+
+  } catch (err) {
+
+    // ERRO AO CONECTAR AO SERVIDOR
+    console.error("Erro de conexão:", err);
+    alert("Falha ao conectar ao servidor.");
   }
-
-  // Busca e filtra localmente
-  document.getElementById('search').addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase();
-    const items = Array.from(document.querySelectorAll('#lista-resumos .list-group-item'));
-    items.forEach(it => {
-      const text = it.textContent.toLowerCase();
-      it.style.display = text.includes(q) ? '' : 'none';
-    });
-  });
-
-  // evita injeção simples
-  function escapeHtml(str) {
-    return String(str || '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-  }
-
-    (function() {
-    const logout = document.getElementById('logout-link');
-    if (!logout) return;
-    logout.addEventListener('click', (e) => {
-      e.preventDefault();
-      const ok = confirm('Deseja realmente sair?');
-      if (ok) {
-        // remove o token (se houver) e redireciona para a tela de login
-        try { localStorage.removeItem('token'); } catch (err) { /* noop */ }
-        window.location.href = 'login.html';
-      }
-    });
-  })();
-
-  // inicializa
-  fetchResumos();
-
-  const btnUpload = document.getElementById('btn-upload');
-    if (btnUpload) {
-      btnUpload.addEventListener('click', function() {
-       window.location.href = 'upload.html';
-      });
-}
+});
 </script>
+
+
 </body>
 </html>
