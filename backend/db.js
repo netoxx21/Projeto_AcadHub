@@ -2,13 +2,11 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { Pool } = require('pg');
 
-// Só carrega o arquivo .env local **quando necessário**
-// Nunca força caminho no Render
+// Carrega .env SOMENTE quando não estiver no Render
 if (!process.env.DATABASE_URL) {
   dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 }
 
-// Verifica se está em produção (Render)
 const isProduction = Boolean(process.env.DATABASE_URL);
 
 const pool = new Pool(
@@ -26,14 +24,14 @@ const pool = new Pool(
       }
 );
 
-// Teste de Conexão
+// Teste de conexão
 pool.connect()
   .then(client => {
-    console.log('Conexão estabelecida com sucesso!');
+    console.log('Conexão com PostgreSQL bem-sucedida!');
     client.release();
   })
   .catch(err => {
-    console.error('ERRO FATAL: Falha de Conexão.');
+    console.error('ERRO FATAL: Não foi possível conectar ao banco.');
     console.error('Detalhe:', err.message);
     process.exit(1);
   });
